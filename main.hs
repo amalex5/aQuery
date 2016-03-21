@@ -1,43 +1,37 @@
 -- symdiff
 
----import System.IO
+import System.IO
+import Expr
+import Parser
+import Diff
 
-data Expr = Val Int
-		   | Const [Char] -- :: [Char] -> Expr
-		   | Symbol
-		   | Neg Expr
-           | Add Expr Expr
-           | Mul Expr Expr
-           | Sub Expr Expr
-           | Pow Expr Expr
-           | Div Expr Expr
-           | Exp Expr
-           | Log Expr
-           | Sin Expr 
-           | Cos Expr
-           | Fxn [Char] Expr
-           deriving (Show,Eq)
+ddx = diff "x"
 
--- how do i factor out the binary and unary operations into seperate subtypes?
+main :: IO ()
+main = runRepl
 
-diff :: Expr -> Expr
-diff (Val _ ) = Val 0
-diff (Const _ ) = Val 0
-diff (Symbol) = Val 1
-diff (Neg x) = Neg (diff x)
-diff (Add x y) = Add (diff x) (diff y)
-diff (x `Mul` y) = ( (diff x) `Mul` y ) `Add`  (x `Mul` (diff y) )
-diff (Sub x y) = diff (Add x (Neg y))
-diff (Pow x (Val n)) = Mul (Val n) (Pow x (Val (n - 1) ) )
-diff (Div x y) = diff (Mul x (Pow y (Val (-1)) ) )
-diff (Exp x) = Mul (Exp x) (diff x)
-diff (Sin x) = Mul (Cos x) (diff x)
-diff (Cos x) = Neg (Mul (Sin x) (diff  x) )
---diff (Fxn xs y) = Mul (Fxn (xs ++ "\'") y) (diff y)
-diff (Fxn name arg) = case name of
-	"sin" -> Mul (Fxn "cos" arg) (diff arg)
-    "cos" -> Mul (Neg (Fxn "sin" arg)) (diff arg) 
-    otehrwise -> Mul (Fxn (name ++ "\'") arg) (diff arg) -- generic chain rule
+flushStr :: String -> IO ()
+flushStr str = putStr str >> hFlush stdout
+
+readPrompt :: String -> IO String
+readPrompt prompt = flushStr prompt >> getLine
+
+evalString :: String -> IO String
+--evalString expr = return $ extractValue $ trapError (liftM show $ readExpr expr >>= eval)
+evalString expr = return $ pprint . simplify . ddx $ parseExpr (expr)
+
+evalAndPrint :: String -> IO ()
+evalAndPrint expr =  evalString expr >>= putStrLn
+
+until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
+until_ pred prompt action = do 
+   result <- prompt
+   if pred result 
+      then return ()
+      else action result >> until_ pred prompt action
+
+runRepl :: IO ()
+runRepl = until_ (== "quit") (readPrompt "sd>>> ") evalAndPrint
 
 simplify :: Expr -> Expr
 simplify (Mul (Val x) (Val y)) = Val (x*y)
@@ -73,8 +67,6 @@ simplify (Pow x y)
   | y == (Val 1) = x
   | y == (Val 0) = Val 1
   | otherwise = Pow x y
-simplify (Cos x) = Cos (simplify x)
-simplify (Sin x) = Sin (simplify x)
 simplify (Fxn f y) = Fxn f (simplify y)
 simplify x = x
 
@@ -84,31 +76,31 @@ simplify x = x
 pprint :: Expr -> [Char]
 pprint (Neg x) = "-" ++ pprint x
 pprint (Add x y) = pprint x ++ "+" ++ pprint y
-pprint (Mul Symbol (Val x)) = show x ++ "x"
-pprint (Mul (Val x) Symbol) = show x ++ "x"
+--pprint (Mul Symbol (Val x)) = show x ++ "x"
+--pprint (Mul (Val x) Symbol) = show x ++ "x"
+pprint (Sub x y) = pprint x ++ "-" ++ pprint y
 pprint (Mul x y) = pprint x ++ "*" ++ pprint y
-pprint (Pow x y) = pprint x ++ "^" ++ pprint y
-pprint Symbol = "x"
-pprint (Const x) = x
+pprint (Div x y) = pprint x ++ "/" ++ pprint y
+pprint (Pow x (Val y) ) = pprint x ++ "^" ++ show y
+pprint (Pow x y) = pprint x ++ "^(" ++ pprint y ++ ")"
+pprint (Var x) = x
 pprint (Val x) = show x
-pprint (Cos x) = "cos(" ++ pprint x ++ ")"
-pprint (Sin x) =  "sin(" ++ pprint x ++ ")"
-pprint (Exp x) = "e^(" ++ pprint x ++ ")"
+pprint (Fxn "exp" x) = "e^(" ++ pprint x ++ ")"
 pprint (Fxn xs y) = xs ++ "(" ++ pprint y ++ ")"
 
 test0 :: Expr
-test0 = (Add (Pow Symbol (Val 2)) (Mul (Exp Symbol) (Sin ( Mul (Val 5) Symbol))))
+test0 = (Add (Pow (Var "x") (Val 2)) (Mul (Fxn "exp" (Var "x")) (Fxn "sin" ( Mul (Val 5) (Var "x")))))
 
 test1 :: Expr
-test1 = (Add (Sin (Mul (Val 5) (Pow Symbol (Val 7)))) (Mul (Val 4) (Neg Symbol)) )
+test1 = (Add (Fxn "sin" (Mul (Val 5) (Pow (Var "x") (Val 7)))) (Mul (Val 4) (Neg (Var "x"))) )
 
 test2 :: Expr
-test2 = (Neg (Cos (Mul Symbol (Val 5))))
+test2 = (Neg (Fxn "cos" (Mul (Var "x") (Val 5))))
 
 test3 :: Expr
-test3 = (Fxn "f" (Mul (Exp (Mul (Val 5) Symbol)) (Pow Symbol (Val 7))))
+test3 = (Fxn "f" (Mul (Fxn "exp" (Mul (Val 5) (Var "x"))) (Pow (Var "x") (Val 7))))
 
-
+testEmAll = map ddx [test0,test1,test2,test3]
 
 
 --display  :: Expr -> IO ()

@@ -1,28 +1,31 @@
 
-module Parser
+module Parser (parseExpr)
 where
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr
+import Expr 
 
-data Expr = Val Integer 
-           | Var [Char]
-           | Exp Expr Expr
-           | Mul Expr Expr 
-           | Add Expr Expr
-           | Sub Expr Expr
-           | Div Expr Expr
-           | Fxn [Char] Expr
-          deriving (Show,Eq)
+--data Expr = Val Integer 
+--           | Var [Char]
+--           | Exp Expr Expr
+--           | Mul Expr Expr 
+--           | Add Expr Expr
+--           | Sub Expr Expr
+--           | Div Expr Expr
+--           | Fxn [Char] Expr
+--          deriving (Show,Eq)
 
-parseExpr inp = parse expr "parser!" inp
+parseExpr inp = case   parse expr "parser!" inp of
+  Left err -> Error "the parser failed! :("
+  Right val -> (val)
 
 expr :: Parser Expr
 expr = buildExpressionParser table factor <?> "expression"
 
 table :: [[ Operator Char st Expr ]]
 table = [
-    [ binary "^" Exp AssocRight], -- can't add "**" as an alternative because it conflicts with "*" as the multiplication operator. not sure how to easily fix without writing all my own parsing machinery...
+    [ binary "^" Pow AssocRight], -- can't add "**" as an alternative because it conflicts with "*" as the multiplication operator. not sure how to easily fix without writing all my own parsing machinery...
     [ binary "*" Mul AssocLeft, binary "/" Div AssocLeft ],
     [ binary "+" Add AssocLeft, binary "-" Sub AssocLeft ]
     ]
