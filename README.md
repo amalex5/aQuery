@@ -13,6 +13,7 @@ $[x^5].add[x^7]
 
 you can evaluate
 
+also, it only supports integers.
 
 TODO: 
 sub nothing into eval and calculate as much as you can

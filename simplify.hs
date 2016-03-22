@@ -8,7 +8,6 @@ simplify (Mul (Val x) (Val y)) = Val (x*y)
 simplify (Add (Val x) (Val y)) = Val (x+y)
 simplify (Sub (Val x) (Val y)) = Val (x-y)
 simplify (Pow (Val x) (Val y)) = Val (x^y)
-simplify (Neg (Val 0)) = Val 0
 simplify (Neg (Val x)) = Val (-x)
 simplify (Neg (Neg x)) =  simplify x
 simplify (Neg x) = Neg (simplify x)
