@@ -1,8 +1,11 @@
-module Diff (diffn,diff)
+module Diff (ddx,diffn,diff)
 where
 
 import Expr
 import Simplify
+
+-- shorthand for differentiating with respect to x:
+ddx = diff "x"
 
 -- take an nth derivative:
 diffn :: Int -> [Char] -> Expr -> Expr

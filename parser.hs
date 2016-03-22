@@ -1,5 +1,5 @@
 
-module Parser (parseExpr,parseWrappedExpressions)
+module Parser (parseExpr,parseWrappedExpressions,parseEquals)
 where
 
 import Text.ParserCombinators.Parsec
@@ -17,15 +17,26 @@ import Expr
 --          deriving (Show,Eq)
 
 parseWrappedExpressions :: String -> [WrapperFxn]
-parseWrappedExpressions inp = case parse manyWrappers "wrapped!" inp of
+parseWrappedExpressions inp = case parse manyWrappers "wrapper parser" inp of
   Left err -> [WrapperFxn ("Error","Error")] -- talk about shitty error handling!
   Right val -> val
 
+parseEquals :: String -> (Expr,Expr)
+parseEquals inp = case   parse equalityExpr "equality parser" inp of
+  Left err -> (Error "the parser failed! :(", Error "yup")
+  Right val -> val
 
 parseExpr :: String -> Expr
-parseExpr inp = case   parse expr "parser!" inp of
+parseExpr inp = case   parse expr "expression parser" inp of
   Left err -> Error "the parser failed! :("
   Right val -> val
+
+equalityExpr :: Parser (Expr,Expr)
+equalityExpr = do 
+                       a <- expr
+                       char '='
+                       b <- expr
+                       return $ (a,b)
 
 expr :: Parser Expr
 expr = buildExpressionParser table factor <?> "expression"
@@ -81,7 +92,6 @@ wrapper = do
 
 manyWrappers :: Parser [WrapperFxn]
 manyWrappers = wrapper `sepBy` (char '.')
-
 
 
 

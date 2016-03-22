@@ -1,2 +1,14 @@
 
-andrew's jquery flavored barely working symbolic system!
+A barely-working symbolic algebra system that can take derivatives, simplify basic expressions, and not much else! No error-handling! Weird jQuery style syntax!
+
+$[x^2 + sin(x)].diff[x]
+>> 2x + cos(x)
+
+$[1*a + 0].simplify[]
+>> a
+
+$[x^5].add[x^7]
+>> x^5 + x^7
+
+
+you can evaluate
