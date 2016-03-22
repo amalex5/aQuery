@@ -4,6 +4,7 @@ import System.IO
 import Expr
 import Parser
 import Diff
+import Simplify
 
 ddx = diff "x"
 
@@ -18,10 +19,10 @@ readPrompt prompt = flushStr prompt >> getLine
 
 evalString :: String -> IO String
 --evalString expr = return $ extractValue $ trapError (liftM show $ readExpr expr >>= eval)
-evalString expr = return $ pprint . simplify . ddx $ parseExpr (expr)
+evalString expr = return $ show (pprint . evalWrapper . parseWrappedExpressions $ expr)
 
 evalAndPrint :: String -> IO ()
-evalAndPrint expr =  evalString expr >>= putStrLn
+evalAndPrint expr =  (evalString expr) >>= putStrLn
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
 until_ pred prompt action = do 
@@ -33,42 +34,36 @@ until_ pred prompt action = do
 runRepl :: IO ()
 runRepl = until_ (== "quit") (readPrompt "sd>>> ") evalAndPrint
 
-simplify :: Expr -> Expr
-simplify (Mul (Val x) (Val y)) = Val (x*y)
-simplify (Add (Val x) (Val y)) = Val (x+y)
-simplify (Neg (Val 0)) = Val 0
-simplify (Neg (Val x)) = Val (-x)
-simplify (Neg (Neg x)) =  simplify x
-simplify (Neg x) = Neg (simplify x)
-simplify (Add x y)
-  | simplify x == (Val 0) = simplify y
-  | simplify y == (Val 0) = simplify x
-  | simplify x == simplify y = Mul (Val 2) (simplify x)
-  | otherwise = (Add (simplify x) (simplify y) ) 
-simplify (Mul x y)
-  | simplify x == (Val 1) = simplify y
-  | simplify y == (Val 1) = simplify x
-  | simplify x == (Val 0) = Val 0
-  | simplify y == (Val 0) = Val 0
-  | simplify x == simplify y = (Pow x (Val 2))
-  | otherwise = (Mul (simplify x) (simplify y) )
-simplify (Sub x y)
-  | simplify x == (Val 0) = simplify (Neg y)
-  | simplify y == (Val 0) = simplify x
-  | simplify x == simplify y = Val 0
-  | otherwise = (Sub (simplify x) (simplify y) ) 
-simplify (Div x y)
-  | simplify y == (Val 1) = simplify x
-  | simplify x == (Val 0) = Val 0
-  | simplify y == (Val 0) = error "no division by zero!"
-  | simplify x == simplify y = Val 1
-  | otherwise = (Div (simplify x) (simplify y) )
-simplify (Pow x y)
-  | y == (Val 1) = x
-  | y == (Val 0) = Val 1
-  | otherwise = Pow x y
-simplify (Fxn f y) = Fxn f (simplify y)
-simplify x = x
+
+evalWrapper :: [WrapperFxn] -> Expr
+evalWrapper = foldl foldingFxn (Val 0)
+  where 
+    foldingFxn _ (WrapperFxn ("$",y)) = (parseExpr y)
+    foldingFxn b (WrapperFxn ("diff",y)) = diff y b
+    --foldingFxn b (WrapperFxn ("simplify",_)) = simplify b
+    --foldingFxn b (WrapperFxn ("eval",x)) = evalExpr x b
+    --foldingFxn b (WrapperFxn ("add",y)) = (Add b (parseExpr y) )
+    --foldingFxn b (WrapperFxn ("sub",y)) = (Sub b (parseExpr y) )
+    --foldingFxn b (WrapperFxn ("mul",y)) = (Mul b (parseExpr y) )
+    --foldingFxn b (WrapperFxn ("div",y)) = (Div b (parseExpr y) )
+    ---- deal with errors. 
+
+--evalWrapper (WrapperFxn (a,b)) = case a of
+--  "$" -> parseExpr b
+--  "diff" -> undefined -- how do we
+
+testWrappers = [testWrapper1,testWrapper2]
+testWrapper1 = WrapperFxn ("$","x^7 + sin(5*x)")
+testWrapper2 = WrapperFxn ("diff","x")
+--- AAAAAGH MAKE IT WORK FOR SPACES!!!!!!
+testWrapper3 = WrapperFxn ("add","x^7+sin(5*x)")
+testWrapper4 = WrapperFxn ("add","x^5+sin(7*x)")
+
+evalExpr :: [Char] -> Int -> Expr -> Expr
+-- sub in int for char
+evalExpr = undefined
+
+
 
 
 -- redo this so it's some pretty tree un-parsing with operational priority!

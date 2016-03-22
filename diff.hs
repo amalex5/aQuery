@@ -1,8 +1,15 @@
-module Diff
+module Diff (diffn,diff)
 where
 
 import Expr
+import Simplify
 
+-- take an nth derivative:
+diffn :: Int -> [Char] -> Expr -> Expr
+diffn 1 v x = simplify $ diff v x
+diffn n v x = diffn (n - 1) v (simplify $ diff v x)
+
+-- take a first derivative:
 diff :: [Char] -> Expr -> Expr 
 --[Char] is the variable we differentiate against
 -- written "v" below
@@ -15,9 +22,9 @@ diff v (Add x y) = Add (diff v x) (diff v y)
 diff v (x `Mul` y) = ( (diff v x) `Mul` y ) `Add`  (x `Mul` (diff v y) )
 diff v (Sub x y) = diff v (Add x (Neg y))
 diff v (Pow x y)
-  | x == Var v = Mul x (Pow x (Sub y (Val 1)) )
+  | x == Var v = Mul y (Pow x (Sub y (Val 1)) )
   | x == Var "e" = diff v (Fxn "exp" x)
-  | otherwise = Add (Mul (Mul (Pow x y) (diff v y) ) (Fxn "ln" x) ) (Mul (Mul (Pow x (Sub y (Val 1))) (y)) (diff v x) ) 
+  -- | otherwise = Add (Mul (Mul (Pow x y) (diff v y) ) (Fxn "ln" x) ) (Mul (Mul (Pow x (Sub y (Val 1))) (y)) (diff v x) ) 
   -- the last one is the very general form
 --diff v (Pow (Var v) (Val n)) = Mul (Val n) (Pow x (Val (n - 1) ) )
 --diff v (Pow (Var "e") x ) = diff v (Fxn "exp" x)

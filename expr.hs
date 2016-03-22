@@ -1,6 +1,9 @@
 module Expr
 where
 
+data WrapperFxn = WrapperFxn (String,String)
+   deriving (Show)
+
 data Expr = Val Int
 		   | Var [Char] -- :: [Char] -> Expr
 		   | Neg Expr

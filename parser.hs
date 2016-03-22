@@ -1,5 +1,5 @@
 
-module Parser (parseExpr)
+module Parser (parseExpr,parseWrappedExpressions)
 where
 
 import Text.ParserCombinators.Parsec
@@ -16,9 +16,16 @@ import Expr
 --           | Fxn [Char] Expr
 --          deriving (Show,Eq)
 
+parseWrappedExpressions :: String -> [WrapperFxn]
+parseWrappedExpressions inp = case parse manyWrappers "wrapped!" inp of
+  Left err -> [WrapperFxn ("Error","Error")] -- talk about shitty error handling!
+  Right val -> val
+
+
+parseExpr :: String -> Expr
 parseExpr inp = case   parse expr "parser!" inp of
   Left err -> Error "the parser failed! :("
-  Right val -> (val)
+  Right val -> val
 
 expr :: Parser Expr
 expr = buildExpressionParser table factor <?> "expression"
@@ -62,3 +69,20 @@ number = do { ds <- many1 digit; return (Val $ read ds) } <?> "number"
 
 variable :: Parser Expr
 variable = many letter >>= return . Var 
+
+
+wrapper :: Parser WrapperFxn
+wrapper = do 
+           name <-  (many1 letter) <|> (string "$")
+           char '['
+           contents <- anyChar `manyTill` (char ']') --probably Expr, but don't parse it yet
+           --char ']'
+           return $ WrapperFxn (name,contents)
+
+manyWrappers :: Parser [WrapperFxn]
+manyWrappers = wrapper `sepBy` (char '.')
+
+
+
+
+
