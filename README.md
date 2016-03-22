@@ -12,3 +12,8 @@ $[x^5].add[x^7]
 
 
 you can evaluate
+
+
+TODO: 
+sub nothing into eval and calculate as much as you can
+list of things to sub in in eval
