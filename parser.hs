@@ -27,19 +27,19 @@ parseEquals inp = case   parse equalityExpr "equality parser" inp of
   Right val -> val
 
 parseExpr :: String -> Expr
-parseExpr inp = case   parse expr "expression parser" inp of
+parseExpr inp = case parse expr "expression parser" inp of
   Left err -> Error "the parser failed! :("
   Right val -> val
 
 equalityExpr :: Parser (Expr,Expr)
 equalityExpr = do 
-                       a <- expr
-                       char '='
-                       b <- expr
-                       return $ (a,b)
+                 a <- expr
+                 char '='
+                 b <- expr
+                 return $ (a,b)
 
 expr :: Parser Expr
-expr = buildExpressionParser table factor <?> "expression"
+expr = spaces >> buildExpressionParser table factor <?> "expression"
 
 table :: [[ Operator Char st Expr ]]
 table = [
@@ -48,17 +48,19 @@ table = [
     [ binary "+" Add AssocLeft, binary "-" Sub AssocLeft ]
     ]
   where
-     binary  name fun assoc = Infix (do{ string name; return fun }) assoc
+     binary  name fun assoc = Infix (do{ spaces; string name; spaces; return fun }) assoc
      prefix  name fun       = Prefix (do{ string name; return fun })
      postfix name fun       = Postfix (do{ string name; return fun })
 
 
 factor = 
-   try function -- "try" consumes no input, whereas <|> does. 
+       try function -- "try" consumes no input, whereas <|> does. 
    <|> parens
    <|> number
    <|> variable
    <?> "simple expression"
+   
+
 
 function :: Parser Expr
 function = do 
@@ -76,10 +78,15 @@ parens = do
          return x
 
 number :: Parser Expr
-number = do { ds <- many1 digit; return (Val $ read ds) } <?> "number"
+number = do { spaces; ds <- many1 digit; spaces; return (Val $ read ds) } <?> "number"
 
 variable :: Parser Expr
-variable = many letter >>= return . Var 
+variable = do
+  spaces
+  c <- many letter
+  spaces
+  return $ Var c
+--variable = many letter >>= return . Var 
 
 
 wrapper :: Parser WrapperFxn

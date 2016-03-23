@@ -16,6 +16,15 @@ data Expr = Val Int
            | Error [Char]
            deriving (Show,Eq)
 
+data Op a = Add' a | Mul' a | Fxn' [Char] a
+  deriving Show
+
+data Expr' = Val' Int
+           | Var' [Char]
+           | Op [Expr']
+           | Error [Char]
+           deriving Show
+
 -- GOOD LORD THIS IS GROSS WON'T YOU PLEASE FACTOR THIS OUT
 -- INTO A SIMPLER DATA TYPE
 -- I CAN'T EVEN MAKE IT INTO A STUPID FUNCTOR B/C IT'S THE WRONG KIND

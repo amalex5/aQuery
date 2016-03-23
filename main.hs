@@ -5,6 +5,7 @@ import Expr
 import Parser
 import Diff
 import Simplify
+import Control.Monad.State
 
 main :: IO ()
 main = runRepl
@@ -17,10 +18,13 @@ readPrompt prompt = flushStr prompt >> getLine
 
 evalString :: String -> IO String
 --evalString expr = return $ extractValue $ trapError (liftM show $ readExpr expr >>= eval)
-evalString expr = return $ show (pprint . evalWrapper . parseWrappedExpressions $ expr)
+evalString expr = return $ id (pprint . evalWrapper . parseWrappedExpressions $ expr)
 
 evalAndPrint :: String -> IO ()
 evalAndPrint expr =  (evalString expr) >>= putStrLn
+
+promptString :: String
+promptString = "aQuery>> "
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
 until_ pred prompt action = do 
@@ -30,7 +34,7 @@ until_ pred prompt action = do
       else action result >> until_ pred prompt action
 
 runRepl :: IO ()
-runRepl = until_ (== "quit") (readPrompt "sd>>> ") evalAndPrint
+runRepl = until_ (== "quit") (readPrompt promptString) evalAndPrint
 
 
 first :: [a] -> a
@@ -39,10 +43,17 @@ first = head
 second :: [a] -> a
 second = head . tail
 
+
+--pop :: State Stack Expr  
+--pop = State $ \(x:xs) -> (x,xs)  
+  
+--push :: Int -> State Stack ()  
+--push a = State $ \xs -> ((),a:xs)  
+
 evalWrapper :: [WrapperFxn] -> Expr
 evalWrapper = foldl foldingFxn (Val 0)
   where 
-    foldingFxn _ (WrapperFxn ("$",y)) = (parseExpr y)
+    foldingFxn _ (WrapperFxn ("$",y))   = (parseExpr y)
     foldingFxn b (WrapperFxn ("diff",y)) = diff y b
     foldingFxn b (WrapperFxn ("simplify",_)) = simplify b
     foldingFxn b (WrapperFxn ("eval",x)) = evalExpr (parseEquals x) b
@@ -50,6 +61,10 @@ evalWrapper = foldl foldingFxn (Val 0)
     foldingFxn b (WrapperFxn ("sub",y)) = (Sub b (parseExpr y) )
     foldingFxn b (WrapperFxn ("mul",y)) = (Mul b (parseExpr y) )
     foldingFxn b (WrapperFxn ("div",y)) = (Div b (parseExpr y) )
+    foldingFxn b (WrapperFxn ("pow",y)) = (Pow b (parseExpr y) )
+
+    -- foldingFxn b (WrapperFxn ("showAST",_)) = b
+
     -- deal with errors. 
 
 --evalWrapper (WrapperFxn (a,b)) = case a of
@@ -63,9 +78,9 @@ testWrapper2 = WrapperFxn ("diff","x")
 testWrapper3 = WrapperFxn ("add","x^7+sin(5*x)")
 testWrapper4 = WrapperFxn ("add","x^5+sin(7*x)")
 
-evalExpr :: (Expr,Expr) -> Expr -> Expr
 -- in the expression e, replace all occurances of a with b
-evalExpr (a,b) e = if e == a then b else exprMap (evalExpr (a,b)) e
+evalExpr :: (Expr,Expr) -> Expr -> Expr
+evalExpr (a,b) e = simplify ( if e == a then b else exprMap (evalExpr (a,b)) e )
 
 testEvalExpr = evalExpr ((Var "x"),(Val 5))   (Mul (Add (Val 7) (Var "b")) (Div (Val 1) (Var "x"))) 
 testEvalExpr2 = evalExpr ((Var "x"),(Var "i've been replaced!"))   (Add (Var "j") (Mul (Val 7) (Fxn "sin" (Var "x"))) )
@@ -76,17 +91,17 @@ testEvalExpr2 = evalExpr ((Var "x"),(Var "i've been replaced!"))   (Add (Var "j"
 pprint :: Expr -> [Char]
 pprint (Neg x) = "-" ++ pprint x
 pprint (Add x y) = pprint x ++ "+" ++ pprint y
---pprint (Mul Symbol (Val x)) = show x ++ "x"
---pprint (Mul (Val x) Symbol) = show x ++ "x"
 pprint (Sub x y) = pprint x ++ "-" ++ pprint y
 pprint (Mul x y) = pprint x ++ "*" ++ pprint y
 pprint (Div x y) = pprint x ++ "/" ++ pprint y
-pprint (Pow x (Val y) ) = pprint x ++ "^" ++ show y
-pprint (Pow x y) = pprint x ++ "^(" ++ pprint y ++ ")"
+pprint (Pow x y) = case y of
+  Val n -> pprint x ++ "^" ++ show n
+  Var n -> pprint x ++ "^" ++ show n
+  otherwise -> pprint x ++ "^(" ++ pprint y ++ ")"
 pprint (Var x) = x
 pprint (Val x) = show x
-pprint (Fxn "exp" x) = "e^(" ++ pprint x ++ ")"
-pprint (Fxn xs y) = xs ++ "(" ++ pprint y ++ ")"
+--pprint (Fxn "exp" x) = "e^(" ++ pprint x ++ ")"
+pprint (Fxn c y) = c ++ "(" ++ pprint y ++ ")"
 
 test0 :: Expr
 test0 = (Add (Pow (Var "x") (Val 2)) (Mul (Fxn "exp" (Var "x")) (Fxn "sin" ( Mul (Val 5) (Var "x")))))
