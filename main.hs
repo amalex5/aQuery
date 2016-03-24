@@ -43,18 +43,11 @@ first = head
 second :: [a] -> a
 second = head . tail
 
-
---pop :: State Stack Expr  
---pop = State $ \(x:xs) -> (x,xs)  
-  
---push :: Int -> State Stack ()  
---push a = State $ \xs -> ((),a:xs)  
-
 evalWrapper :: [WrapperFxn] -> Expr
 evalWrapper = foldl foldingFxn (Val 0)
   where 
     foldingFxn _ (WrapperFxn ("$",y))   = (parseExpr y)
-    foldingFxn b (WrapperFxn ("diff",y)) = diff y b
+    foldingFxn b (WrapperFxn ("diff",y)) = diffn 1 y b
     foldingFxn b (WrapperFxn ("simplify",_)) = simplify b
     foldingFxn b (WrapperFxn ("eval",x)) = evalExpr (parseEquals x) b
     foldingFxn b (WrapperFxn ("add",y)) = (Add b (parseExpr y) )

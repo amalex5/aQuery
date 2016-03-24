@@ -1,14 +1,14 @@
 aQuery
 ===
 
-A barely-working symbolic algebra system that can take derivatives, simplify basic expressions, and not much else! No error-handling! Weird jQuery style syntax!
+aQuery is barely-working symbolic algebra system that can take derivatives, simplify basic expressions, and not much else! It has no error-handling! It has weird jQuery style syntax!
 
-You can initialize mathematical expressions using `$`, and then chain other functions to them:
+You can initialize a mathematical expression using `$`, and then chain other functions to it:
 
     $[x^2 + sin(x)].diff[x]
     >> 2x + cos(x)
 
-There are lots of things we can chain on:
+There are lots of things we can chain:
 
     $[x^2].add[sin(x)].mul[5]
     >> x^2+sin(x)*5

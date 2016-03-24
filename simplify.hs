@@ -27,7 +27,7 @@ simplify' (Mul x y)
   | simplify' x == (Val 0) = Val 0
   | simplify' y == (Val 0) = Val 0
   | simplify' x == simplify' y = (Pow x (Val 2))
-  | otherwise =  (Mul (simplify' x) (simplify' y) )
+  | otherwise =  prodTree (Mul (simplify' x) (simplify' y) )
 simplify' (Sub x y)
   | simplify' x == (Val 0) = simplify' (Neg y)
   | simplify' y == (Val 0) = simplify' x
@@ -77,6 +77,29 @@ bubbleSums' acc rst (Add     x     y     ) = (i+j        , m++n)
 bubbleSums' acc rst           z            = (acc        , z:rst)
 
 
+prodTree :: Expr -> Expr
+prodTree t = prodTree1 $ bubbleProds t
+
+prodTree1 :: (Int,[Expr]) -> Expr
+prodTree1 (x,y) = prodTree2 (Val x) y
+
+prodTree2 :: Expr -> [Expr] -> Expr
+prodTree2 x [] = x
+prodTree2 x (y:[]) = Mul x y
+prodTree2 x (y:ys) = sumTree2 (Mul x y) ys
+
+bubbleProds :: Expr -> (Int,[Expr])
+bubbleProds = bubbleProds' 1 []
+
+bubbleProds' :: Int -> [Expr] -> Expr -> (Int,[Expr])
+bubbleProds' acc rst (Mul (Val x) (Val y )) = (acc * x * y, rst)
+bubbleProds' acc rst (Mul (Val x)    y    ) = bubbleProds' (acc * x) rst y
+bubbleProds' acc rst (Mul     x   (Val y )) = bubbleProds' (acc * y) rst x
+bubbleProds' acc rst (Mul     x     y     ) = (i*j        , m++n)
+     where 
+     	(i,m) = bubbleProds' acc rst x
+     	(j,n) = bubbleProds' 1 [] y --let's not double the accumulators
+bubbleProds' acc rst           z            = (acc        , z:rst)
 
 
 

@@ -33,9 +33,9 @@ diff v (Pow x y)
 --diff v (Pow (Var "e") x ) = diff v (Fxn "exp" x)
 diff v (Div x y) = diff v (Mul x (Pow y (Val (-1)) ) )
 diff v (Fxn name arg) = case name of
-	"sin" -> Mul (Fxn "cos" arg) (diff v arg)
-	"cos" -> Mul (Neg (Fxn "sin" arg)) (diff v arg)
-	"tan" -> Mul (Div (Val 1) (Mul (Fxn "cos" arg) (Fxn "cos" arg))) (diff v arg)
-	"exp" -> Mul (Fxn "exp" arg) (diff v arg)
-	"ln"  -> Mul (Div (Val 1) (arg)) (diff v arg)
-	otherwise -> Mul (Fxn (name ++ "\'") arg) (diff v arg) -- generic chain rule
+    "sin" -> Mul (Fxn "cos" arg) (diff v arg)
+    "cos" -> Mul (Neg (Fxn "sin" arg)) (diff v arg)    
+    "tan" -> Mul (Div (Val 1) (Mul (Fxn "cos" arg) (Fxn "cos" arg))) (diff v arg)
+    "exp" -> Mul (Fxn "exp" arg) (diff v arg)
+    "ln"  -> Mul (Div (Val 1) (arg)) (diff v arg)
+    otherwise -> Mul (Fxn (name ++ "\'") arg) (diff v arg) -- generic chain rule
