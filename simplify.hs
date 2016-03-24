@@ -20,7 +20,7 @@ simplify' (Add x y)
   | simplify' x == (Val 0) = simplify' y
   | simplify' y == (Val 0) = simplify' x
   | simplify' x == simplify' y = Mul (Val 2) (simplify' x)
-  | otherwise = (Add (simplify' x) (simplify' y) ) 
+  | otherwise = sumTree (Add (simplify' x) (simplify' y) ) 
 simplify' (Mul x y)
   | simplify' x == (Val 1) = simplify' y
   | simplify' y == (Val 1) = simplify' x
@@ -46,3 +46,39 @@ simplify' (Pow x y)
 simplify' (Fxn f y) = Fxn f (simplify' y)
 simplify' (Var c) = Var c
 simplify' x = x
+
+
+-- sumTree takes a tree whose top-level node is an Add node
+-- and adds up all the values, respecting order of operations
+sumTree :: Expr -> Expr
+sumTree t = sumTree1 $ bubbleSums t
+
+sumTree1 :: (Int,[Expr]) -> Expr
+sumTree1 (x,y) = sumTree2 (Val x) y
+
+sumTree2 :: Expr -> [Expr] -> Expr
+sumTree2 x [] = x
+sumTree2 x (y:[]) = Add x y
+sumTree2 x (y:ys) = sumTree2 (Add x y) ys
+
+-- bubble sums takes a tree whose top-level node is an Add node
+-- and returns a tuple whose first element
+bubbleSums :: Expr -> (Int,[Expr])
+bubbleSums = bubbleSums' 0 []
+
+bubbleSums' :: Int -> [Expr] -> Expr -> (Int,[Expr])
+bubbleSums' acc rst (Add (Val x) (Val y )) = (acc + x + y, rst)
+bubbleSums' acc rst (Add (Val x)    y    ) = bubbleSums' (acc + x) rst y
+bubbleSums' acc rst (Add     x   (Val y )) = bubbleSums' (acc + y) rst x
+bubbleSums' acc rst (Add     x     y     ) = (i+j        , m++n)
+     where 
+     	(i,m) = bubbleSums' acc rst x
+     	(j,n) = bubbleSums' 0 [] y --let's not double the accumulators
+bubbleSums' acc rst           z            = (acc        , z:rst)
+
+
+
+
+
+
+
