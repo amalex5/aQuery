@@ -70,6 +70,8 @@ for all the code!
 
 
 TODO: 
+- make it not evaluate blank lines
+-- maybe add a nil value
 - teach it how to distribute 
 - use state monad to add a concept of "it"
 sub nothing into eval and calculate as much as you can

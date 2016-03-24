@@ -64,10 +64,12 @@ factor =
 
 function :: Parser Expr
 function = do 
+           spaces
            name <- many1 letter
            char '('
            argument <- expr
            char ')'
+           spaces
            return $ Fxn name argument
 
 parens :: Parser Expr
@@ -92,10 +94,15 @@ variable = do
 wrapper :: Parser WrapperFxn
 wrapper = do 
            name <-  (many1 letter) <|> (string "$")
-           char '['
-           contents <- anyChar `manyTill` (char ']') --probably Expr, but don't parse it yet
+           char '('
+           contents <- anyChar `manyTill` try endWrapper -- (char ').' <|> (char ')' >>= spaces eof )--probably Expr, but don't parse it yet
            --char ']'
            return $ WrapperFxn (name,contents)
+
+endWrapper :: Parser ()
+endWrapper = do
+            char ')'
+            lookAhead ( skipMany1 (char '.') <|> skipMany1 space <|> eof )
 
 manyWrappers :: Parser [WrapperFxn]
 manyWrappers = wrapper `sepBy` (char '.')

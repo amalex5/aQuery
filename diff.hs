@@ -25,8 +25,10 @@ diff v (Add x y) = Add (diff v x) (diff v y)
 diff v (x `Mul` y) = ( (diff v x) `Mul` y ) `Add`  (x `Mul` (diff v y) )
 diff v (Sub x y) = diff v (Add x (Neg y))
 diff v (Pow x y)
-  | x == Var v = Mul y (Pow x (Sub y (Val 1)) )
+  | ( (diff v y) == (Val 0) ) = Mul y (Pow x (Sub y (Val 1)) )
+  -- | x == Var v = Mul y (Pow x (Sub y (Val 1)) )
   | x == Var "e" = diff v (Fxn "exp" x)
+  -- | otherwise = 
   -- | otherwise = Add (Mul (Mul (Pow x y) (diff v y) ) (Fxn "ln" x) ) (Mul (Mul (Pow x (Sub y (Val 1))) (y)) (diff v x) ) 
   -- the last one is the very general form
 --diff v (Pow (Var v) (Val n)) = Mul (Val n) (Pow x (Val (n - 1) ) )
