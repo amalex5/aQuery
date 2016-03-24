@@ -9,8 +9,8 @@ simplify inp = case simplify' inp of
   otherwise -> simplify (simplify' inp) 
 
 simplify' :: Expr -> Expr
-simplify' (Mul (Val x) (Val y)) = Val (x*y)
-simplify' (Add (Val x) (Val y)) = Val (x+y)
+--simplify' (Mul (Val x) (Val y)) = Val (x*y)
+--simplify' (Add (Val x) (Val y)) = Val (x+y)
 simplify' (Sub (Val x) (Val y)) = Val (x-y)
 simplify' (Pow (Val x) (Val y)) = Val (x^y)
 simplify' (Neg (Val x)) = Val (-x)
@@ -102,6 +102,11 @@ bubbleProds' acc rst (Mul     x     y     ) = (i*j        , m++n)
 bubbleProds' acc rst           z            = (acc        , z:rst)
 
 
+
+distribute :: Expr -> Expr
+distribute (Mul (Add x y) z) = undefined
+distribute (Mul x (Add y z)) = undefined
+distribute z = z
 
 
 

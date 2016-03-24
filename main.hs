@@ -109,19 +109,3 @@ test3 :: Expr
 test3 = (Fxn "f" (Mul (Fxn "exp" (Mul (Val 5) (Var "x"))) (Pow (Var "x") (Val 7))))
 
 testEmAll = map ddx [test0,test1,test2,test3]
-
-
---display  :: Expr -> IO ()
---display es  =  do result <- ((pprint . simplify . diff) es)
---                  putStr "result is: "
---                  putStr result
---                  putStr "\n"
-
---main :: IO ()
---main = do hSetBuffering stdout NoBuffering
---          putStrLn "\nandrew's symbolic differentiator!"
---          putStrLn "-----------------------------\n"
---          putStr "enter an expression! : "
---          ns <- readLn
---          display ns
-

@@ -13,10 +13,10 @@ There are lots of things we can chain:
     $[x^2].add[sin(x)].mul[5]
     >> x^2+sin(x)*5
 
-Um, I guarantee you that in the internal state of the program, it actually looks correct: like `5 * (x^2 + sin(x))`. I guarentee it! Here, we can check by evaluating it for `x=5`:
+Um, I guarantee you that in the internal state of the program, it actually looks correct: like `5 * (x^2 + sin(x))`. I promise! Here, we can check by evaluating it for `x=2`:
 
-    $[x^2].add[sin(x)].mul[5].eval[x=5]
-
+    $[x^2].add[sin(x)].mul[5].eval[x=2]
+    >> 5*4+sin(2)
 
 You can evaluate symbolic expressions:
 
@@ -70,6 +70,7 @@ for all the code!
 
 
 TODO: 
+- teach it how to distribute 
 - use state monad to add a concept of "it"
 sub nothing into eval and calculate as much as you can
 list of things to sub in in eval
