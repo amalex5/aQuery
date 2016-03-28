@@ -8,7 +8,7 @@ import Simplify
 import Control.Monad.State
 
 main :: IO ()
-main = runRepl
+main = putStrLn welcomeString >> runRepl
 
 flushStr :: String -> IO ()
 flushStr str = putStr str >> hSetBuffering stdin LineBuffering --hFlush stdout
@@ -22,6 +22,9 @@ evalString expr = return $ id (pprint . evalWrapper . parseWrappedExpressions $ 
 
 evalAndPrint :: String -> IO ()
 evalAndPrint expr =  (evalString expr) >>= putStrLn
+
+welcomeString :: String
+welcomeString = "welcome to aQuery!\n\"quit\" to quit."
 
 promptString :: String
 promptString = "aQuery>> "
@@ -95,6 +98,7 @@ pprint (Var x) = x
 pprint (Val x) = show x
 --pprint (Fxn "exp" x) = "e^(" ++ pprint x ++ ")"
 pprint (Fxn c y) = c ++ "(" ++ pprint y ++ ")"
+pprint (Error x) =  show x
 pprint z = show z
 
 test0 :: Expr

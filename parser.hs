@@ -56,10 +56,9 @@ table = [
 factor = 
        try function -- "try" consumes no input, whereas <|> does. 
    <|> parens
-   <|> numMulVar
+   <|> try numMulVar
    <|> number
    <|> variable
-   <|> spaces
    <?> "simple expression"
    
 
@@ -112,7 +111,7 @@ endWrapper :: Parser ()
 endWrapper = do
             spaces
             char ')'
-            skipMany1 (char '.') <|> spaces eof
+            lookAhead ( skipMany1 (char '.') <|> (spaces >> eof) )
 
 manyWrappers :: Parser [WrapperFxn]
 manyWrappers = wrapper `sepBy` (char '.')
