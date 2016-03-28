@@ -56,8 +56,10 @@ table = [
 factor = 
        try function -- "try" consumes no input, whereas <|> does. 
    <|> parens
+   <|> numMulVar
    <|> number
    <|> variable
+   <|> spaces
    <?> "simple expression"
    
 
@@ -90,6 +92,13 @@ variable = do
   return $ Var c
 --variable = many letter >>= return . Var 
 
+numMulVar :: Parser Expr
+numMulVar = do
+  spaces
+  d <- many1 digit
+  c <- many1 letter
+  spaces
+  return $ Mul (Val $ read d) (Var c)
 
 wrapper :: Parser WrapperFxn
 wrapper = do 
@@ -101,8 +110,9 @@ wrapper = do
 
 endWrapper :: Parser ()
 endWrapper = do
+            spaces
             char ')'
-            lookAhead ( skipMany1 (char '.') <|> skipMany1 space <|> eof )
+            skipMany1 (char '.') <|> spaces eof
 
 manyWrappers :: Parser [WrapperFxn]
 manyWrappers = wrapper `sepBy` (char '.')

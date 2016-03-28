@@ -95,6 +95,7 @@ pprint (Var x) = x
 pprint (Val x) = show x
 --pprint (Fxn "exp" x) = "e^(" ++ pprint x ++ ")"
 pprint (Fxn c y) = c ++ "(" ++ pprint y ++ ")"
+pprint z = show z
 
 test0 :: Expr
 test0 = (Add (Pow (Var "x") (Val 2)) (Mul (Fxn "exp" (Var "x")) (Fxn "sin" ( Mul (Val 5) (Var "x")))))
