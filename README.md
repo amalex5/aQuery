@@ -64,7 +64,7 @@ or build it:
     "quit" to quit.
     aQuery>>
 
-It requires [Parsec](https://hackage.haskell.org/package/parsec)
+It requires [Parsec](https://hackage.haskell.org/package/parsec).
 
 Credits
 ----
@@ -73,6 +73,7 @@ I wrote this at the [Recurse Center](http://www.recurse.com). The REPL code was 
 
 TODO
 ----
+- add error handling
 - make it not evaluate blank lines
 -- maybe add a nil value
 - use state monad to add a concept of "it"
