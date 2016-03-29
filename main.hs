@@ -44,16 +44,16 @@ runRepl = until_ (== "quit") (readPrompt promptString) evalAndPrint
 evalWrapper :: [WrapperFxn] -> Expr
 evalWrapper = foldl foldingFxn (Val 0)
   where 
-    foldingFxn _ (WrapperFxn ("$",y))   = (parseExpr y)
-    foldingFxn b (WrapperFxn ("diff",y)) = diffn 1 y b
-    foldingFxn b (WrapperFxn ("simplify",_)) = simplify b
-    foldingFxn b (WrapperFxn ("eval",x)) = evalExpr (parseEquals x) b
-    foldingFxn b (WrapperFxn ("showAST",_)) = Var (show b)
-    foldingFxn b (WrapperFxn ("add",y)) = (Add b (parseExpr y) )
-    foldingFxn b (WrapperFxn ("sub",y)) = (Sub b (parseExpr y) )
-    foldingFxn b (WrapperFxn ("mul",y)) = (Mul b (parseExpr y) )
-    foldingFxn b (WrapperFxn ("div",y)) = (Div b (parseExpr y) )
-    foldingFxn b (WrapperFxn ("pow",y)) = (Pow b (parseExpr y) )
+    foldingFxn _ (WrapperFxn ("$",        y))   = (parseExpr y)
+    foldingFxn b (WrapperFxn ("diff",     y)) = diffn 1 y b
+    foldingFxn b (WrapperFxn ("simplify", _)) = simplify b
+    foldingFxn b (WrapperFxn ("eval",     y)) = evalExpr (parseEquals y) b
+    foldingFxn b (WrapperFxn ("showAST",  _)) = Var (show b)
+    foldingFxn b (WrapperFxn ("add",      y)) = (Add b (parseExpr y) )
+    foldingFxn b (WrapperFxn ("sub",      y)) = (Sub b (parseExpr y) )
+    foldingFxn b (WrapperFxn ("mul",      y)) = (Mul b (parseExpr y) )
+    foldingFxn b (WrapperFxn ("div",      y)) = (Div b (parseExpr y) )
+    foldingFxn b (WrapperFxn ("pow",      y)) = (Pow b (parseExpr y) )
     -- deal with errors. 
 
 -- in the expression e, replace all occurances of a with b

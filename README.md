@@ -25,8 +25,8 @@ We can simplify expressions:
 
 We can simplify and evaluate expressions, even if they return symbolic forms:
 
-   $(a*x^2 + b*x + c).eval(x = 1)
-   >> a + b + c
+    $(a*x^2 + b*x + c).eval(x = 1)
+    >> a + b + c
 
 Need to debug? Calling `blah.showAST()` will print out the internal binary tree representation of `blah`.
 
@@ -74,7 +74,7 @@ It requires [Parsec](https://hackage.haskell.org/package/parsec).
 Credits
 ----
 
-I wrote this at the [Recurse Center](http://www.recurse.com). The REPL code was basically stolen fron [Write Yourself A Scheme in 48 Hours](https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours). 
+I wrote this at the [Recurse Center](http://www.recurse.com) as an exercise in learning Haskell. The REPL code was basically stolen fron [Write Yourself A Scheme in 48 Hours](https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours). 
 
 TODO
 ----
@@ -83,7 +83,7 @@ TODO
 - make it not evaluate blank lines
 -- maybe add a nil value
 - use state monad to add a concept of "it"
-sub nothing into eval and calculate as much as you can
-list of things to sub in in eval
-distribute multiplication
+- sub nothing into eval and calculate as much as you can
+- list of things to sub in in eval
+- distribute multiplication
 - the parser ignores whitespace, but the code to do so is really ugly. (i.e., there's a "spaces" parser tossed in EVERYWHERE.) make this all more beautiful.
