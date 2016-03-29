@@ -40,11 +40,6 @@ runRepl :: IO ()
 runRepl = until_ (== "quit") (readPrompt promptString) evalAndPrint
 
 
-first :: [a] -> a
-first = head
-
-second :: [a] -> a
-second = head . tail
 
 evalWrapper :: [WrapperFxn] -> Expr
 evalWrapper = foldl foldingFxn (Val 0)
@@ -71,6 +66,8 @@ pprint :: Expr -> [Char]
 pprint (Neg x) = "-" ++ pprint x
 pprint (Add x y) = pprint x ++ "+" ++ pprint y
 pprint (Sub x y) = pprint x ++ "-" ++ pprint y
+pprint (Mul (Var c) (Val x)) = c ++ show x
+pprint (Mul (Val x) (Var c)) = c ++ show x
 pprint (Mul x y) = pprint x ++ "*" ++ pprint y
 pprint (Div x y) = pprint x ++ "/" ++ pprint y
 pprint (Pow x y) = case y of

@@ -8,7 +8,7 @@ You can initialize a mathematical expression using `$`, and then chain other fun
     $( x^2 + sin(x) ).diff(x)
     >> 2x + cos(x)
 
-There are lots of things we can chain:
+We can chain lots of things together:
 
     $(x^2 + 5x - b*x).add(12).diff(x).eval(x=2)
     >> 9 - b
@@ -22,6 +22,11 @@ We can simplify expressions:
 
     $(1*a+0).simplify()
     >> a
+
+We can simplify and evaluate expressions, even if they return symbolic forms:
+
+   $(a*x^2 + b*x + c).eval(x = 1)
+   >> a + b + c
 
 Need to debug? Calling `blah.showAST()` will print out the internal binary tree representation of `blah`.
 
@@ -73,6 +78,7 @@ I wrote this at the [Recurse Center](http://www.recurse.com). The REPL code was 
 
 TODO
 ----
+- add better pretty printer
 - add error handling
 - make it not evaluate blank lines
 -- maybe add a nil value
