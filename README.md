@@ -1,7 +1,7 @@
 aQuery
 ===
 
-aQuery is barely-working symbolic algebra system that can take derivatives, simplify basic expressions, and not much else––all using weird jQuery-style syntax! It also has no error-handling.
+aQuery is <del>barely-working</del> minimalist symbolic algebra system that can take derivatives, simplify basic expressions, and not much else––all using weird jQuery-style syntax! It also has no error-handling.
 
 You can initialize a mathematical expression using `$`, and then chain other functions to it:
 
