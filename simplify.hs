@@ -21,7 +21,7 @@ simplify' (Add x y)
   | simplify' x == (Val 0) = simplify' y
   | simplify' y == (Val 0) = simplify' x
   | simplify' x == simplify' y = Mul (Val 2) (simplify' x)
-  | otherwise = sumTree (Add (simplify' x) (simplify' y) )
+  | otherwise = (Add (simplify' x) (simplify' y) )
 --simplify' (Mul x (Add y z)) = Add (Mul x y) (Mul x z)
 --simplify' (Mul (Add x y) z) = Add (Mul x z) (Mul y z)
 simplify' (Mul x y)
@@ -30,7 +30,7 @@ simplify' (Mul x y)
   | simplify' x == (Val 0) = Val 0
   | simplify' y == (Val 0) = Val 0
   | simplify' x == simplify' y = (Pow x (Val 2))
-  | otherwise = prodTree (Mul (simplify' x) (simplify' y) )
+  | otherwise = (Mul (simplify' x) (simplify' y) )
 simplify' (Sub x y)
   | simplify' x == (Val 0) = simplify' (Neg y)
   | simplify' y == (Val 0) = simplify' x

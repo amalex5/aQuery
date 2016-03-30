@@ -5,15 +5,15 @@ data WrapperFxn = WrapperFxn (String,String)
    deriving (Show)
 
 data Expr = Val Int
-		   | Var [Char] -- :: [Char] -> Expr
-		   | Neg Expr
-           | Add Expr Expr
-           | Mul Expr Expr
-           | Sub Expr Expr
-           | Div Expr Expr
-           | Pow Expr Expr -- a^b
-           | Fxn [Char] Expr
-           | Error [Char]
+		      | Var [Char] -- :: [Char] -> Expr
+		      | Neg Expr
+          | Add Expr Expr
+          | Mul Expr Expr
+          | Sub Expr Expr
+          | Div Expr Expr
+          | Pow Expr Expr -- a^b
+          | Fxn [Char] Expr
+          | Error [Char]
            deriving (Show,Eq)
 
 

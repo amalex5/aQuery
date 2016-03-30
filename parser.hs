@@ -6,15 +6,6 @@ import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr
 import Expr 
 
---data Expr = Val Integer 
---           | Var [Char]
---           | Exp Expr Expr
---           | Mul Expr Expr 
---           | Add Expr Expr
---           | Sub Expr Expr
---           | Div Expr Expr
---           | Fxn [Char] Expr
---          deriving (Show,Eq)
 
 parseWrappedExpressions :: String -> [WrapperFxn]
 parseWrappedExpressions inp = case parse manyWrappers "wrapper parser" inp of

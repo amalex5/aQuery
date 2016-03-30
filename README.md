@@ -1,7 +1,7 @@
 aQuery
 ===
 
-aQuery is <del>barely-working</del> minimalist symbolic algebra system that can take derivatives, simplify basic expressions, and not much else––all using weird jQuery-style syntax! It also has no error-handling.
+aQuery is <del>barely-working</del> minimalist symbolic algebra system that can simplify basic expressions, take derivatives, and not much else––all using weird jQuery-style syntax! It also has no error-handling.
 
 You can initialize a mathematical expression using `$`, and then chain other functions to it:
 
@@ -35,7 +35,7 @@ aQuery only supports integers, because other numbers are messy.
 "Standard Library"
 ----
 
-- `$(x)` : initializes a new mathematical expression
+- `$(x)` : parses `x` and initializes a new mathematical expression
 
 - `x.add(y)`: adds expression `y` to `x`
 - `x.sub(y)`: subtracts expression `y` from `x`
@@ -78,12 +78,12 @@ I wrote this at the [Recurse Center](http://www.recurse.com) as an exercise in l
 
 TODO
 ----
-- add better pretty printer
+- add better pretty printer that takes operator priority into account
 - add error handling
 - make it not evaluate blank lines
 -- maybe add a nil value
 - use state monad to add a concept of "it"
 - sub nothing into eval and calculate as much as you can
-- list of things to sub in in eval
-- distribute multiplication
+- list of things to sub in in eval (this and the former should be straightforward and related)
+- try to simplify towards some sort of normal form
 - the parser ignores whitespace, but the code to do so is really ugly. (i.e., there's a "spaces" parser tossed in EVERYWHERE.) make this all more beautiful.
